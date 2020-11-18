@@ -11,7 +11,7 @@ plugins {
 
 val versionMajor = 0
 val versionMinor = 1
-val versionPatch = 0
+val versionPatch = 1
 val versionText = "$versionMajor.$versionMinor.$versionPatch"
 
 group = "org.dda.ankoLogger"
@@ -30,19 +30,32 @@ kotlin {
     android{
         publishLibraryVariants("release", "debug")
     }
-    iosX64("ios") {
+    val libName = "${project.name}_lib"
+    val iosX64 = iosX64("ios") {
         binaries {
             framework {
-                baseName = "library"
+                baseName = libName
             }
         }
     }
-    iosArm64 {
+    val iosArm64 =iosArm64 {
         binaries {
             framework {
-                baseName = "library"
+                baseName = libName
             }
         }
+    }
+    // Create a task to build a fat framework.
+    tasks.create("debugFatFramework", org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask::class) {
+        // The fat framework must have the same base name as the initial frameworks.
+        baseName = libName
+        // The default destination directory is '<build directory>/fat-framework'.
+        destinationDir = buildDir.resolve("fat-framework/debug")
+        // Specify the frameworks to be merged.
+        from(
+            iosX64.binaries.getFramework("DEBUG"),
+            iosArm64.binaries.getFramework("DEBUG")
+        )
     }
 
     sourceSets {
