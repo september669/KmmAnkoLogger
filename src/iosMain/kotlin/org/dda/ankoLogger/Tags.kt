@@ -5,7 +5,7 @@ import kotlin.reflect.KClass
 actual fun AnkoLogger.getTag(): String {
     val clazz = this::class
     val key = TagKey(this.hashCode(), clazz)
-    return tags[key] ?: "${clazz.simpleName}_${this.hashCode()}".also {
+    return tags[key] ?: "${clazz.simpleName}${this.hashCode()}".also {
             tags[key] = it
             if (tags.size > tagsSize) {
                 val tagsOldestKey = tags.keys.firstOrNull()

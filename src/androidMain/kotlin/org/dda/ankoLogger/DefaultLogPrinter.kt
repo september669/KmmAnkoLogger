@@ -4,7 +4,7 @@ package org.dda.ankoLogger
 actual object DefaultLogPrinter : LogPrinter {
 
 
-    override fun log(appTag: String, tag: String, level: Log.Level, msg: String, thr: Throwable?) {
+    override fun log(appTag: String, tag: String, level: LogLevel, msg: String, thr: Throwable?) {
         if (isAndroid) {
             val message = if (thr != null) {
                 msg + '\n' + android.util.Log.getStackTraceString(thr)
@@ -23,11 +23,11 @@ actual object DefaultLogPrinter : LogPrinter {
         System.getProperty("java.vm.name").equals("Dalvik", ignoreCase = true)
     }
 
-    private inline fun sysLogPrefix(logLevel: Log.Level): String {
+    private inline fun sysLogPrefix(logLevel: LogLevel): String {
         return "THR_ID ${"%04d".format(Thread.currentThread().id)} ${logLevel.text}"
     }
 
-    private inline fun Log.Level.toAndroidLevel(): Int {
+    private inline fun LogLevel.toAndroidLevel(): Int {
         return this.code
     }
 
