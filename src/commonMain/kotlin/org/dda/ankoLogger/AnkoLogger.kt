@@ -3,15 +3,12 @@
 package org.dda.ankoLogger
 
 
-private var loggerAppTag = "AnkoLogger"
-private var loggerAppLevel = Log.Level.Verbose
-
 fun configAnkoLogger(
-    logTag: String,
+    applicationTag: String,
     logLevel: Log.Level = Log.Level.Verbose,
     vararg logPrinter: LogPrinter = arrayOf(DefaultLogPrinter)
 ) {
-    loggerAppTag = logTag
+    loggerAppTag = applicationTag
     loggerAppLevel = logLevel
     logPrinter.forEach { printer ->
         Log.registerPrinter(printer)
@@ -27,7 +24,7 @@ fun configAnkoLogger(
  *
  * Instead of hardcoding tags, Anko provides an [AnkoLogger] interface. You can just add the interface to
  *   any of your classes, and use any of the provided extension functions, such as
- *   [AnkoLogger.debug] or [AnkoLogger.errorLog].
+ *   [AnkoLogger.logDebug] or [AnkoLogger.logError].
  *
  * The tag is the simple class name by default, but you can change it to anything you want just
  *   by overriding the [loggerTag] property.
@@ -40,6 +37,9 @@ interface AnkoLogger {
     val loggerTag: String
         get() = getTag()
 
+    /**
+     * Usefull when need to disable/enable logging for specific class
+     */
     val classLogLevel: Log.Level
         get() = Log.Level.Verbose
 }
@@ -67,7 +67,7 @@ object Log {
 
     val appLevel: Level get() = loggerAppLevel
 
-    private fun printLogMessage(level: Level, tag: String, msg: String, thr: Throwable?) {
+    fun printLogMessage(level: Level, tag: String, msg: String, thr: Throwable? = null) {
         loggers.forEach {
             it.log(appTag = loggerAppTag, tag = tag, level = level, msg = msg, thr = thr)
         }
@@ -76,247 +76,165 @@ object Log {
     fun registerPrinter(printer: LogPrinter) {
         loggers.add(printer)
     }
-
-    fun e(tag: String, msg: String, thr: Throwable? = null) {
-        printLogMessage(level = Level.Error, tag = tag, msg = msg, thr = thr)
-    }
-
-    fun w(tag: String, msg: String, thr: Throwable? = null) {
-        printLogMessage(level = Level.Warn, tag = tag, msg = msg, thr = thr)
-    }
-
-    fun v(tag: String, msg: String, thr: Throwable? = null) {
-        printLogMessage(level = Level.Verbose, tag = tag, msg = msg, thr = thr)
-    }
-
-
-    fun d(tag: String, msg: String, thr: Throwable? = null) {
-        printLogMessage(level = Level.Debug, tag = tag, msg = msg, thr = thr)
-    }
-
-    fun i(tag: String, msg: String, thr: Throwable? = null) {
-        printLogMessage(level = Level.Info, tag = tag, msg = msg, thr = thr)
-    }
-
-    fun wtf(tag: String, msg: String, thr: Throwable? = null) {
-        printLogMessage(level = Level.Wtf, tag = tag, msg = msg, thr = thr)
-    }
 }
 
 
 /**
- * Send a log message with the [Log.VERBOSE] severity.
- * Note that the log message will not be written if the current log level is above [Log.VERBOSE].
- * The default log level is [Log.INFO].
+ * Send a log message with the [Log.Level.Verbose] severity.
+ * Note that the log message will not be written if the current log level is above [loggerAppTag] or [AnkoLogger.classLogLevel].
  *
  * @param message the message text to log. `null` value will be represent as "null", for any other value
  *   the [Any.toString] will be invoked.
  * @param thr an exception to log (optional).
  *
- * @see [Log.v].
  */
-fun AnkoLogger.verbose(message: Any?, thr: Throwable? = null) {
+fun AnkoLogger.logVerbose(message: Any?, thr: Throwable? = null) {
     log(this, message, thr, Log.Level.Verbose,
-        { tag, msg -> Log.v(tag, msg) },
-        { tag, msg, throwable -> Log.v(tag, msg, throwable) })
+        { level, tag, msg -> Log.printLogMessage(level, tag, msg) },
+        { level, tag, msg, throwable -> Log.printLogMessage(level, tag, msg, throwable) })
+}
+
+inline fun AnkoLogger.logVerbose(message: () -> Any?) {
+    val level = Log.Level.Verbose
+    if (isLoggable(level)) {
+        Log.printLogMessage(level, loggerTag, message()?.toString() ?: "null")
+    }
 }
 
 /**
- * Send a log message with the [Log.DEBUG] severity.
- * Note that the log message will not be written if the current log level is above [Log.DEBUG].
- * The default log level is [Log.INFO].
+ * Send a log message with the [Log.Level.Debug] severity.
+ * Note that the log message will not be written if the current log level is above [loggerAppTag] or [AnkoLogger.classLogLevel].
  *
  * @param message the message text to log. `null` value will be represent as "null", for any other value
  *   the [Any.toString] will be invoked.
  * @param thr an exception to log (optional).
  *
- * @see [Log.d].
  */
-fun AnkoLogger.debug(message: Any?, thr: Throwable? = null) {
+fun AnkoLogger.logDebug(message: Any?, thr: Throwable? = null) {
     log(this, message, thr, Log.Level.Debug,
-        { tag, msg -> Log.d(tag, msg) },
-        { tag, msg, throwable -> Log.d(tag, msg, throwable) })
+        { level, tag, msg -> Log.printLogMessage(level, tag, msg) },
+        { level, tag, msg, throwable -> Log.printLogMessage(level, tag, msg, throwable) })
+}
+
+inline fun AnkoLogger.logDebug(message: () -> Any?) {
+    val level = Log.Level.Debug
+    if (isLoggable(level)) {
+        Log.printLogMessage(level, loggerTag, message()?.toString() ?: "null")
+    }
 }
 
 /**
- * Send a log message with the [Log.INFO] severity.
- * Note that the log message will not be written if the current log level is above [Log.INFO]
- *   (it is the default level).
+ * Send a log message with the [Log.Level.Info] severity.
+ * Note that the log message will not be written if the current log level is above [loggerAppTag] or [AnkoLogger.classLogLevel].
  *
  * @param message the message text to log. `null` value will be represent as "null", for any other value
  *   the [Any.toString] will be invoked.
  * @param thr an exception to log (optional).
  *
- * @see [Log.i].
  */
-fun AnkoLogger.info(message: Any?, thr: Throwable? = null) {
+fun AnkoLogger.logInfo(message: Any?, thr: Throwable? = null) {
     log(this, message, thr, Log.Level.Info,
-        { tag, msg -> Log.i(tag, msg) },
-        { tag, msg, throwable -> Log.i(tag, msg, throwable) })
+        { level, tag, msg -> Log.printLogMessage(level, tag, msg) },
+        { level, tag, msg, throwable -> Log.printLogMessage(level, tag, msg, throwable) })
+}
+
+inline fun AnkoLogger.logInfo(message: () -> Any?) {
+    val level = Log.Level.Info
+    if (isLoggable(level)) {
+        Log.printLogMessage(level, loggerTag, message()?.toString() ?: "null")
+    }
 }
 
 /**
- * Send a log message with the [Log.WARN] severity.
- * Note that the log message will not be written if the current log level is above [Log.WARN].
- * The default log level is [Log.INFO].
+ * Send a log message with the [Log.Level.Warn] severity.
+ * Note that the log message will not be written if the current log level is above [loggerAppTag] or [AnkoLogger.classLogLevel].
  *
  * @param message the message text to log. `null` value will be represent as "null", for any other value
  *   the [Any.toString] will be invoked.
  * @param thr an exception to log (optional).
  *
- * @see [Log.w].
  */
-fun AnkoLogger.warn(message: Any?, thr: Throwable? = null) {
+fun AnkoLogger.logWarn(message: Any?, thr: Throwable? = null) {
     log(this, message, thr, Log.Level.Warn,
-        { tag, msg -> Log.w(tag, msg) },
-        { tag, msg, throwable -> Log.w(tag, msg, throwable) })
+        { level, tag, msg -> Log.printLogMessage(level, tag, msg) },
+        { level, tag, msg, throwable -> Log.printLogMessage(level, tag, msg, throwable) })
+}
+
+inline fun AnkoLogger.logWarn(message: () -> Any?) {
+    val level = Log.Level.Warn
+    if (isLoggable(level)) {
+        Log.printLogMessage(level, loggerTag, message()?.toString() ?: "null")
+    }
 }
 
 /**
- * Send a log message with the [Log.ERROR] severity.
- * Note that the log message will not be written if the current log level is above [Log.ERROR].
- * The default log level is [Log.INFO].
+ * Send a log message with the [Log.Level.Error] severity.
+ * Note that the log message will not be written if the current log level is above [loggerAppTag] or [AnkoLogger.classLogLevel].
  *
  * @param message the message text to log. `null` value will be represent as "null", for any other value
  *   the [Any.toString] will be invoked.
  * @param thr an exception to log (optional).
  *
- * @see [Log.e].
  */
-fun AnkoLogger.errorLog(message: Any?, thr: Throwable? = null) {
+fun AnkoLogger.logError(message: Any?, thr: Throwable? = null) {
     log(this, message, thr, Log.Level.Error,
-        { tag, msg -> Log.e(tag, msg) },
-        { tag, msg, throwable -> Log.e(tag, msg, throwable) })
+        { level, tag, msg -> Log.printLogMessage(level, tag, msg) },
+        { level, tag, msg, throwable -> Log.printLogMessage(level, tag, msg, throwable) })
+}
+
+inline fun AnkoLogger.logError(message: () -> Any?) {
+    val level = Log.Level.Error
+    if (isLoggable(level)) {
+        Log.printLogMessage(level, loggerTag, message()?.toString() ?: "null")
+    }
 }
 
 /**
- * Send a log message with the "What a Terrible Failure" severity.
- * Report an exception that should never happen.
+ * Send a log message with the [Log.Level.Assert] severity.
+ * Note that the log message will not be written if the current log level is above [loggerAppTag] or [AnkoLogger.classLogLevel].
  *
  * @param message the message text to log. `null` value will be represent as "null", for any other value
  *   the [Any.toString] will be invoked.
  * @param thr an exception to log (optional).
  *
- * @see [Log.wtf].
  */
-fun AnkoLogger.wtf(message: Any?, thr: Throwable? = null) {
-    if (thr != null) {
-        Log.wtf(loggerTag, message?.toString() ?: "null", thr)
-    } else {
-        Log.wtf(loggerTag, message?.toString() ?: "null")
+fun AnkoLogger.logAssert(message: Any?, thr: Throwable? = null) {
+    log(this, message, thr, Log.Level.Assert,
+        { level, tag, msg -> Log.printLogMessage(level, tag, msg) },
+        { level, tag, msg, throwable -> Log.printLogMessage(level, tag, msg, throwable) })
+}
+
+inline fun AnkoLogger.logAssert(message: () -> Any?) {
+    val level = Log.Level.Assert
+    if (isLoggable(level)) {
+        Log.printLogMessage(level, loggerTag, message()?.toString() ?: "null")
     }
 }
 
-/**
- * Send a log message with the [Log.VERBOSE] severity.
- * Note that the log message will not be written if the current log level is above [Log.VERBOSE].
- * The default log level is [Log.INFO].
- *
- * @param message the function that returns message text to log.
- *   `null` value will be represent as "null", for any other value the [Any.toString] will be invoked.
- *
- * @see [Log.v].
- */
-inline fun AnkoLogger.verbose(message: () -> Any?) {
-    if (Log.isLoggable(Log.Level.Verbose, classLogLevel)) {
-        val tag = loggerTag
-        Log.v(tag, message()?.toString() ?: "null")
-    }
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Send a log message with the [Log.DEBUG] severity.
- * Note that the log message will not be written if the current log level is above [Log.DEBUG].
- * The default log level is [Log.INFO].
- *
- * @param message the function that returns message text to log.
- *   `null` value will be represent as "null", for any other value the [Any.toString] will be invoked.
- *
- * @see [Log.d].
- */
-inline fun AnkoLogger.debug(message: () -> String?) {
-    if (Log.isLoggable(Log.Level.Debug, classLogLevel)) {
-        val tag = loggerTag
-        Log.d(tag, message() ?: "null")
-    }
-}
-
-/**
- * Send a log message with the [Log.INFO] severity.
- * Note that the log message will not be written if the current log level is above [Log.INFO].
- * The default log level is [Log.INFO].
- *
- * @param message the function that returns message text to log.
- *   `null` value will be represent as "null", for any other value the [Any.toString] will be invoked.
- *
- * @see [Log.i].
- */
-inline fun AnkoLogger.info(message: () -> String?) {
-    if (Log.isLoggable(Log.Level.Info, classLogLevel)) {
-        val tag = loggerTag
-        Log.i(tag, message() ?: "null")
-    }
-}
-
-/**
- * Send a log message with the [Log.WARN] severity.
- * Note that the log message will not be written if the current log level is above [Log.WARN].
- * The default log level is [Log.INFO].
- *
- * @param message the function that returns message text to log.
- *   `null` value will be represent as "null", for any other value the [Any.toString] will be invoked.
- *
- * @see [Log.w].
- */
-inline fun AnkoLogger.warn(message: () -> String?) {
-    if (Log.isLoggable(Log.Level.Warn, classLogLevel)) {
-        val tag = loggerTag
-        Log.w(tag, message() ?: "null")
-    }
-}
-
-/**
- * Send a log message with the [Log.ERROR] severity.
- * Note that the log message will not be written if the current log level is above [Log.ERROR].
- * The default log level is [Log.INFO].
- *
- * @param message the function that returns message text to log.
- *   `null` value will be represent as "null", for any other value the [Any.toString] will be invoked.
- *
- * @see [Log.e].
- */
-inline fun AnkoLogger.errorLog(message: () -> String?) {
-    if (Log.isLoggable(Log.Level.Error, classLogLevel)) {
-        val tag = loggerTag
-        Log.e(tag, message() ?: "null")
-    }
-}
-
-
-inline fun AnkoLogger.printStackTrace(message: () -> Any?) {
-    errorLog(message().toString(), Exception())
-}
-
+private var loggerAppTag = "AnkoLogger"
+private var loggerAppLevel = Log.Level.Verbose
 
 private inline fun log(
     logger: AnkoLogger,
     message: Any?,
     thr: Throwable?,
     level: Log.Level,
-    f: (String, String) -> Unit,
-    fThrowable: (String, String, Throwable) -> Unit
+    f: (level: Log.Level, tag: String, message: String) -> Unit,
+    fThrowable: (level: Log.Level, tag: String, message: String, thr: Throwable) -> Unit
 ) {
     val tag = logger.loggerTag
-    if (Log.isLoggable(level, logger.classLogLevel)) {
+    if (logger.isLoggable(level)) {
         if (thr != null) {
-            fThrowable(tag, message?.toString() ?: "null", thr)
+            fThrowable(level, tag, message?.toString() ?: "null", thr)
         } else {
-            f(tag, message?.toString() ?: "null")
+            f(level, tag, message?.toString() ?: "null")
         }
     }
 }
 
-fun Log.isLoggable(level: Log.Level, classLogLevel: Log.Level): Boolean {
+fun AnkoLogger.isLoggable(level: Log.Level): Boolean {
     return level.code >= loggerAppLevel.code &&
             level.code >= classLogLevel.code
 }
