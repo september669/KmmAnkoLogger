@@ -21,7 +21,7 @@ actual object DefaultLogPrinter : LogPrinter {
         //val foo: CPointer<mach_header>? = interpretCPointer<mach_header>(__dso_handle.rawPtr)
         //kotlinx.cinterop.cValuesOf(foo)
         _os_log_internal(__dso_handle.ptr, logType, logLevelIos, msg)
-        if (applicationLogLevel.code < LogLevel.Info.code) {
+        if (LOG_CONFIG.applicationLevel.code < LogLevel.Info.code) {
             println(msg)
         }
     }
