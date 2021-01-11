@@ -13,6 +13,7 @@ actual class AtomicRef<T> actual constructor(value: T) {
 
 }
 
+@Suppress("NOTHING_TO_INLINE")
 actual inline fun <T> T.freeze(): T {
     return this
 }
