@@ -9,7 +9,7 @@ plugins {
 
 val versionMajor = 0
 val versionMinor = 2
-val versionPatch = 0
+val versionPatch = 1
 val versionText = "$versionMajor.$versionMinor.$versionPatch"
 
 group = "org.dda.ankoLogger"
