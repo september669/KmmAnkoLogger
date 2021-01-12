@@ -16,8 +16,6 @@ group = "org.dda.ankoLogger"
 version = versionText
 
 
-
-
 repositories {
     gradlePluginPortal()
     google()
@@ -77,11 +75,7 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
-        val androidMain by getting {
-            dependencies {
-                implementation("androidx.core:core-ktx:1.3.2")
-            }
-        }
+        val androidMain by getting
         val androidTest by getting
         val iosMain by getting
         val iosTest by getting
@@ -91,7 +85,7 @@ kotlin {
 android {
     compileSdkVersion(30)
     defaultConfig {
-        minSdkVersion(24)
+        minSdkVersion(20)
         targetSdkVersion(30)
         versionCode = 1
         versionName = versionText
