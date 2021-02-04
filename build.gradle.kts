@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.konan.properties.loadProperties
-
 plugins {
     kotlin("multiplatform") version "1.4.30"
     id("com.android.library")
@@ -99,6 +97,7 @@ android {
 }
 
 //      Publishing
+/*
 
 val (bintrayUser, bintrayPass, bintrayKey) = project.rootProject.file("publish.properties").let {
     it.absolutePath
@@ -122,3 +121,4 @@ publishing {
         }
     }
 }
+*/
