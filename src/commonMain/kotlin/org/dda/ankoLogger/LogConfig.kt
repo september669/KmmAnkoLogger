@@ -1,6 +1,10 @@
 package org.dda.ankoLogger
 
-
+/**
+ * @param [applicationTag] Tag for application
+ * @param [logLevel] application minimal log level, see org.dda.ankoLogger.LogLevel
+ * @param [listPrinters] you can use [DefaultLogPrinter] or create you own printers (e.g. add post logs to crashlytics)
+ */
 fun configAnkoLogger(
     applicationTag: String,
     logLevel: LogLevel = LogLevel.Verbose,

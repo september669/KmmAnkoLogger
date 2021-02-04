@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.konan.properties.loadProperties
 
 plugins {
-    kotlin("multiplatform") version "1.4.10"
+    kotlin("multiplatform") version "1.4.30"
     id("com.android.library")
     id("kotlin-android-extensions")
     id("maven-publish")
@@ -10,6 +10,7 @@ plugins {
 val versionMajor = 0
 val versionMinor = 2
 val versionPatch = 1
+val versionNum = 10_000 * versionMajor + 100 * versionMinor + 1 * versionPatch
 val versionText = "$versionMajor.$versionMinor.$versionPatch"
 
 group = "org.dda.ankoLogger"
@@ -34,10 +35,10 @@ kotlin {
         }
     }
 
-    android{
+    android {
         publishLibraryVariants("release", "debug")
     }
-    
+
 
     val libName = "${project.name}_lib"
     val iosX64 = iosX64("ios") {
@@ -47,7 +48,7 @@ kotlin {
             }
         }
     }
-    val iosArm64 =iosArm64 {
+    val iosArm64 = iosArm64 {
         binaries {
             framework {
                 baseName = libName
@@ -87,7 +88,7 @@ android {
     defaultConfig {
         minSdkVersion(20)
         targetSdkVersion(30)
-        versionCode = 1
+        versionCode = versionNum
         versionName = versionText
     }
     buildTypes {
@@ -103,7 +104,7 @@ val (bintrayUser, bintrayPass, bintrayKey) = project.rootProject.file("publish.p
     it.absolutePath
 }.let { path ->
     loadProperties(path)
-}.let{ prop ->
+}.let { prop ->
     val user = prop.getProperty("bintrayUser")
     val pass = prop.getProperty("bintrayPass")
     val key = prop.getProperty("bintrayKey")
