@@ -8,7 +8,7 @@ package org.dda.ankoLogger
 fun configAnkoLogger(
     applicationTag: String,
     logLevel: LogLevel = LogLevel.Verbose,
-    listPrinters: Collection<LogPrinter> = listOf(DefaultLogPrinter)
+    listPrinters: Collection<LogPrinter> = defaultPrinters()
 ) {
     LogConfig(
         applicationTag = applicationTag,
@@ -16,14 +16,21 @@ fun configAnkoLogger(
         printers = listPrinters
     )
 
-    LOG_CONFIG_REF.value = LogConfig(
-        applicationTag = applicationTag,
-        applicationLevel = logLevel,
-        printers = listPrinters
-    ).freeze()
-
+    lock.withLock {
+        LOG_CONFIG_REF.value.printers.forEach { printer ->
+            printer.close()
+        }
+        LOG_CONFIG_REF.value = LogConfig(
+            applicationTag = applicationTag,
+            applicationLevel = logLevel,
+            printers = listPrinters
+        ).freeze()
+    }
 }
 
+fun defaultPrinters(): List<LogPrinter> = listOf(DefaultLogPrinter())
+
+private val lock = Lock()
 internal val LOG_CONFIG_REF = AtomicRef(LogConfig().freeze())
 val LOG_CONFIG get() = LOG_CONFIG_REF.value
 

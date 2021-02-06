@@ -1,7 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.4.30"
     id("com.android.library")
-    id("kotlin-android-extensions")
     id("maven-publish")
 }
 
@@ -10,6 +9,7 @@ val versionMinor = 2
 val versionPatch = 3
 val versionNum = 10_000 * versionMajor + 100 * versionMinor + 1 * versionPatch
 val versionText = "$versionMajor.$versionMinor.$versionPatch"
+
 
 group = "org.dda.ankoLogger"
 version = versionText
@@ -23,7 +23,6 @@ repositories {
 }
 
 kotlin {
-
 
     targets.all {
         compilations.all {
@@ -40,19 +39,16 @@ kotlin {
 
     val libName = "${project.name}_lib"
     val iosX64 = iosX64("ios") {
+        val main by compilations.getting
+        val interop by main.cinterops.creating
+
         binaries {
             framework {
                 baseName = libName
             }
         }
     }
-    val iosArm64 = iosArm64 {
-        binaries {
-            framework {
-                baseName = libName
-            }
-        }
-    }
+
     // Create a task to build a fat framework.
     tasks.create("debugFatFramework", org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask::class) {
         // The fat framework must have the same base name as the initial frameworks.
@@ -61,8 +57,7 @@ kotlin {
         destinationDir = buildDir.resolve("fat-framework/debug")
         // Specify the frameworks to be merged.
         from(
-            iosX64.binaries.getFramework("DEBUG"),
-            iosArm64.binaries.getFramework("DEBUG")
+            iosX64.binaries.getFramework("DEBUG")
         )
     }
 
@@ -95,30 +90,3 @@ android {
         }
     }
 }
-
-//      Publishing
-/*
-
-val (bintrayUser, bintrayPass, bintrayKey) = project.rootProject.file("publish.properties").let {
-    it.absolutePath
-}.let { path ->
-    loadProperties(path)
-}.let { prop ->
-    val user = prop.getProperty("bintrayUser")
-    val pass = prop.getProperty("bintrayPass")
-    val key = prop.getProperty("bintrayKey")
-    System.err.println("bintray credentials: $user/$pass key: $key")
-    listOf(user, pass, key)
-}
-
-publishing {
-    repositories.maven("https://api.bintray.com/maven/september669/KmmAnkoLogger/AnkoLogger/;publish=1;override=1") {
-        name = "bintray"
-
-        credentials {
-            username = bintrayUser
-            password = bintrayKey
-        }
-    }
-}
-*/

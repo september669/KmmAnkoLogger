@@ -236,6 +236,10 @@ class TestLogFuncs {
                     ).freeze()
         }
 
+        override fun close() {
+            //  do nothing
+        }
+
     }
 
     data class LogEntry(

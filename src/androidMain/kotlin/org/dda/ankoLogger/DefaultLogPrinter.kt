@@ -1,7 +1,7 @@
 package org.dda.ankoLogger
 
 @Suppress("NOTHING_TO_INLINE")
-actual object DefaultLogPrinter : LogPrinter {
+actual class DefaultLogPrinter : LogPrinter {
 
 
     override fun log(appTag: String, tag: String, level: LogLevel, msg: String, thr: Throwable?) {
@@ -16,6 +16,10 @@ actual object DefaultLogPrinter : LogPrinter {
             System.err.println("${sysLogPrefix(level)} $tag: $msg")
             thr?.printStackTrace(System.err)
         }
+    }
+
+    override fun close() {
+        // do nothing
     }
 
     private val isAndroid: Boolean by lazy {

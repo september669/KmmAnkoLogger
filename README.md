@@ -4,17 +4,7 @@ This is the fork of [AnkoLogger](https://github.com/Kotlin/anko/wiki/Anko-Common
 
 ### Using AnkoLogger in your project 
 
-Add to `commonMain` section
-
-```
-sourceSets {
-        val commonMain by getting {
-            dependencies {
-            	api("org.dda.ankoLogger:AnkoLogger:0.2.1")
-            }
-        }
-}
-```
+In progress
 
 ### Trait-like style logging
 ```
