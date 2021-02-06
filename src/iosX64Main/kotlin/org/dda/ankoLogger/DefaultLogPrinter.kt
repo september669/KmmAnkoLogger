@@ -3,6 +3,7 @@ package org.dda.ankoLogger
 import kotlinx.cinterop.ptr
 import platform.darwin.*
 
+
 actual class DefaultLogPrinter : LogPrinter {
 
     override fun log(appTag: String, tag: String, level: LogLevel, msg: String, thr: Throwable?) {

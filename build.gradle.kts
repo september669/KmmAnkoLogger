@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.4.30"
+    kotlin("multiplatform") version "1.4.21"
     id("com.android.library")
     id("maven-publish")
 }
@@ -38,13 +38,16 @@ kotlin {
 
 
     val libName = "${project.name}_lib"
-    val iosX64 = iosX64("ios") {
+    val ios = listOf(iosX64(), iosArm64())
+    configure(ios) {
         val main by compilations.getting
-        val interop by main.cinterops.creating
+        val interop by main.cinterops.creating{
+            defFile(project.file("src/nativeInterop/cinterop/interop.def"))
+        }
 
         binaries {
             framework {
-                baseName = libName
+                baseName = "libName"
             }
         }
     }
@@ -57,7 +60,7 @@ kotlin {
         destinationDir = buildDir.resolve("fat-framework/debug")
         // Specify the frameworks to be merged.
         from(
-            iosX64.binaries.getFramework("DEBUG")
+            ios.map { it.binaries.getFramework("DEBUG") }
         )
     }
 
@@ -69,10 +72,14 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
+
         val androidMain by getting
         val androidTest by getting
-        val iosMain by getting
-        val iosTest by getting
+
+        val iosX64Main by getting
+        val iosArm64Main by getting {
+            dependsOn(iosX64Main)
+        }
     }
 }
 
