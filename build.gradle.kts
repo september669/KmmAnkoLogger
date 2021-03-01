@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.konan.properties.loadProperties
+
 plugins {
     kotlin("multiplatform") version "1.4.21"
     id("com.android.library")
@@ -21,7 +23,6 @@ repositories {
     jcenter()
     mavenCentral()
 }
-
 kotlin {
 
     targets.all {
@@ -94,6 +95,31 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+        }
+    }
+}
+
+
+//      Publishing
+val (bintrayUser, bintrayPass, bintrayKey) = project.rootProject.file("publish.properties").let {
+    it.absolutePath
+}.let { path ->
+    loadProperties(path)
+}.let { prop ->
+    val user = prop.getProperty("bintrayUser")
+    val pass = prop.getProperty("bintrayPass")
+    val key = prop.getProperty("bintrayKey")
+    System.err.println("bintray credentials: $user/$pass key: $key")
+    listOf(user, pass, key)
+}
+
+publishing {
+    repositories.maven("https://api.bintray.com/maven/september669/KmmAnkoLogger/AnkoLogger/;publish=1;override=1") {
+        name = "bintray"
+
+        credentials {
+            username = bintrayUser
+            password = bintrayKey
         }
     }
 }
