@@ -2,12 +2,26 @@
 
 This is the fork of [AnkoLogger](https://github.com/Kotlin/anko/wiki/Anko-Commons-%E2%80%93-Logging) for use it in the Kotlin Multiplatform Mobile
 
-### Using AnkoLogger in your project 
+### Add AnkoLogger to your project 
 
-In progress
+```kotlin
+
+kotlin {
+    android()
+    ios()
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                api("io.github.september669:AnkoLogger:0.2.5")
+            }
+        }
+    }
+}
+
+```
 
 ### Trait-like style logging
-```
+```kotlin
 class Foo : AnkoLogger {
     private fun someMethod() {
         logInfo("London is the capital of Great Britain")
@@ -26,9 +40,9 @@ fun main(){
 }
 ```
 
-Each method has two versions lain and lazy (inlined):
+Each method has two versions plain and lazy:
 
-```
+```kotlin
 	logInfo("London is the capital of Great Britain")
 	logWarn{"London is the capital of Great Britain"}     
 ```
@@ -39,10 +53,10 @@ Lambda result will be calculated only if `AnkoLogger.isLoggable(level: LogLevel)
 ### Logger object style
 You can also use AnkoLogger as a plain object
 
-```
+```kotlin
 class Foo {
 
-	val logWithASpecificTag = ankoLogger("SomeTage")
+	val logWithASpecificTag = ankoLogger("SomeTag")
 
     private fun someMethod() {
     	logWithASpecificTag.logWarn("London is the capital of Great Britain")
