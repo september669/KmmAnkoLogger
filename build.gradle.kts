@@ -9,6 +9,15 @@ plugins {
     https://dev.to/kotlin/how-to-build-and-publish-a-kotlin-multiplatform-library-going-public-4a8k
     https://getstream.io/blog/publishing-libraries-to-mavencentral-2021/#your-first-release
 
+    Build and send
+    0.  ./gradlew clean
+    1.  ./gradlew publishAllPublicationsToSonatypeRepository
+
+    Confirm
+    1.  go to https://s01.oss.sonatype.org/#stagingRepositories
+    2.  Find your repository in the ‘Staging repositories’ section.
+    3.  Close it.
+    4.  🚀 Release it!
 
  */
 
