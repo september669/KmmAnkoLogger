@@ -14,7 +14,7 @@ plugins {
 
 val versionMajor = 0
 val versionMinor = 2
-val versionPatch = 5
+val versionPatch = 6
 val versionNum = 10_000 * versionMajor + 100 * versionMinor + 1 * versionPatch
 val versionText = "$versionMajor.$versionMinor.$versionPatch"
 
