@@ -1,8 +1,16 @@
 plugins {
-    kotlin("multiplatform") version "1.4.30"
+    kotlin("multiplatform") version "1.5.31"// kotlin version
     id("convention.publication")
     id("com.android.library")
 }
+
+/*
+    Publish to maven
+    https://dev.to/kotlin/how-to-build-and-publish-a-kotlin-multiplatform-library-going-public-4a8k
+    https://getstream.io/blog/publishing-libraries-to-mavencentral-2021/#your-first-release
+
+
+ */
 
 val versionMajor = 0
 val versionMinor = 2
