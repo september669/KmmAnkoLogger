@@ -20,6 +20,48 @@ kotlin {
 
 ```
 
+### Init lib 
+
+Android
+```kotlin
+class MainApp : MultiDexApplication(), AnkoLogger {
+    override fun onCreate() {
+        super.onCreate()
+
+        //  init logging with logging tag = "MySuperApp", LogLevel.Verbose 
+        //  and default log printer (printout logs to android.util.Log) 
+        configAnkoLogger(applicationTag = "MySuperApp")
+
+        //  or you can init logger with specific logLevel 
+        //  and add your own log printer 
+        configAnkoLogger(
+            applicationTag = BuildCfg.loggingAppTag,
+            logLevel = LogLevel.Error,
+            listPrinters = defaultPrinters() + FirebaseLogPrinter()
+        )
+        
+    }
+}
+
+class FirebaseLogPrinter : LogPrinter {
+
+    override fun log(appTag: String, tag: String, level: LogLevel, msg: String, thr: Throwable?) {
+        if (level > LogLevel.Info){
+            val message = if (thr != null) {
+                msg + '\n' + android.util.Log.getStackTraceString(thr)
+            } else {
+                msg
+            }
+            Firebase.crashlytics.log("$tag: $message")
+        }
+    }
+
+    override fun close() {
+        //  do nothing
+    }
+}
+```
+
 ### Trait-like style logging
 ```kotlin
 class Foo : AnkoLogger {
