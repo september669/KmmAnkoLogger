@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.5.31"// kotlin version
+    kotlin("multiplatform") version "1.6.0"// kotlin version
     id("convention.publication")
     id("com.android.library")
 }
@@ -35,7 +35,6 @@ version = versionText
 repositories {
     gradlePluginPortal() // To use 'maven-publish' and 'signing' plugins in our own plugin
     google()
-    jcenter()
     mavenCentral()
 }
 
@@ -78,10 +77,10 @@ kotlin {
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdkVersion(31)
     defaultConfig {
         minSdkVersion(20)
-        targetSdkVersion(30)
+        targetSdkVersion(31)
         versionCode = versionNum
         versionName = versionText
     }
