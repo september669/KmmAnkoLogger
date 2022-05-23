@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.6.0"// kotlin version
+    kotlin("multiplatform") version "1.6.10"// kotlin version
     id("convention.publication")
     id("com.android.library")
 }
@@ -23,7 +23,7 @@ plugins {
 
 val versionMajor = 0
 val versionMinor = 2
-val versionPatch = 7
+val versionPatch = 8
 val versionNum = 10_000 * versionMajor + 100 * versionMinor + 1 * versionPatch
 val versionText = "$versionMajor.$versionMinor.$versionPatch"
 

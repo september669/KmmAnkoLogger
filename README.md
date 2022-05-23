@@ -12,7 +12,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api("io.github.september669:AnkoLogger:0.2.7")
+                api("io.github.september669:AnkoLogger:0.2.8")
             }
         }
     }
@@ -20,6 +20,7 @@ kotlin {
 ```
 
 Version 0.2.7 compiled with Kotlin 1.6.0
+Version 0.2.8 compiled with Kotlin 1.6.10
 
 ### Init lib 
 
